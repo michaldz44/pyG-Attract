@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "ID": 1, "MASS": 1, "COLOR": [255,0,0] }, "geometry": { "type": "Point", "coordinates": [ 0 , 0 ] } },
+{ "type": "Feature", "properties": { "ID": 1, "MASS": 1, "COLOR": [255,0,255] }, "geometry": { "type": "Point", "coordinates": [ 0 , 1 ] } }
+]}
