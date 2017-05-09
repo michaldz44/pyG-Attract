@@ -3,7 +3,7 @@ import json
 import sys
 from golem import Golem
 from attractors import Attractors
-import Image, ImageDraw, sys
+import Image
 
 
 
@@ -17,16 +17,28 @@ def main():
     parser.add_argument('--size', type=int, default=100, help='Problem size (N as it will compute NxN matrix) ')
     parser.add_argument('positions', type=str, help='Geojson file containing positions with masses')
 
+    args = parser.parse_args()
+
     with open(args.positions) as file:
         js=json.reads(file.read())
     attractors=Attractors(js)
-    args = parser.parse_args()
+
     N=args.positions
-    bitmap=[[Golem(x,y,args,attractors) for x in range(N)] for y in range(N)]
-    # coś tutaj
-    if allOD(bitmap[y][x].if_stop() for x in range(N)):
-        colormap=[[bitmap[y][x].get_color() for ]
-    
+
+    golems=[Golem(i%N,i//N,args,attractors) for i in range(N*N)]
+    golems_functions=[golem.do_move for golem in golems]
+
+    while any(golems_functions):
+        new_golems_functions=[golem_function() for golem_function in golems_functions]
+        golems_functions=new_golems_functions
+    #
+
+    img = Image.new( 'RGB', (N,N), "black") # create a new black image
+    pixels = img.load() # create the pixel map
+
+    for i in range(N*N):    # for every pixel:
+        pixels[i%N,i//N] = (i%N, i//N, golems[i].get_color()) # set the colour accordingly
+    img.show()
 
 if __name__ == "__main__":
     main()
