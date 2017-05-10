@@ -16,13 +16,13 @@ class Golem(object):
         self.position+=dp
         self.vpredict = self.velocity+ (3.0*self.acceleration0 - self.acceleration1)*dt/2.0
         self.acceleration2 += self.attractors.get_force(self.position,self.vpredict)
-        
-        self.acceleration2 += self(position) - mu*vpredict
+
+        self.acceleration2 += self.position - self.args.mu*self.vpredict
         self.velocity += (2.0*self.acceleration2+5.0*acceleration0 - acceleration1)*dt/6.0
         self.acceleration1 = self.acceleration0
         self.acceleration0 = acceleration2
-                       
-        
+
+
 
     def do_move(self):
         if self.final_attractor:
