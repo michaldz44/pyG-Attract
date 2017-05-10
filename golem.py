@@ -32,6 +32,7 @@ class Golem(object):
         # if final attrator is set we are fixed (attracted)
 
         if self.attractors.min_distance(self.position) < self.args.pot_d and abs(self.velocity) < self.args.term_v: # close to the city and low velocity
+            self.final_attractor=self.attractors.min_attractor(self.position)
             return True
 
 
