@@ -9,7 +9,7 @@ from PIL import Image
 
 def main():
     parser = argparse.ArgumentParser(description='Gravitational attractors')
-    parser.add_argument('--dt', type=float, default=0.05, help='timestep')
+    parser.add_argument('--dt', type=float, default=0.005, help='timestep')
     parser.add_argument('--h', type=float, default=0.2, help='magic depth parameter - DO NOT CHANGE!!!!')
     parser.add_argument('--pot_d', type=float, default=0.005, help='potential diameter')
     parser.add_argument('--term_v', type=float, default=0.005, help='terminatig velocity')
@@ -24,7 +24,7 @@ def main():
 
     with open(args.positions) as file:
         js=json.loads(file.read())
-    attractors=Attractors(js)
+    attractors=Attractors(js,args)
 
     N=args.size
     # We choose points from [0,1]x[0,1] area
@@ -49,7 +49,9 @@ def main():
     pixels = img.load() # create the pixel map
 
     for i in range(N*N):    # for every pixel:
-        pixels[i%N,i//N] = (i%N, i//N, golems[i].get_color()) # set the colour accordingly
+        color = golems[i].get_color()
+        if color:
+            pixels[i%N,i//N] = (i%N, i//N, color) # set the colour accordingly
     img.show()
 
 
