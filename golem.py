@@ -18,16 +18,18 @@ class Golem(object):
         self.acceleration2 += self.attractors.get_force(self.position)
 
     def do_move(self):
-        if not self.end():
-            return self.do_move
-        else:
-            return None
+        if final_attractor:
+            return False
+        self.do_move()
+        self.end_check()
+        return True
 
     def get_color(self):
         if self.final_attractor:
             return self.final_attractor["color"]
 
-    def end(self):
+    def end_check(self):
+        # if final attrator is set we are fixed (attracted)
 
         if self.attractors.min_distance(self.position) < self.args.pot_d and abs(self.velocity) < self.args.term_v: # close to the city and low velocity
             return True
