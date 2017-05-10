@@ -1,5 +1,5 @@
 class Golem(object):
-    def __init__(self x, y, args, attractors):
+    def __init__(self, x, y, args, attractors):
         self.attractors=attractors
         self.args=args
         self.position=complex(x,y)
@@ -12,15 +12,15 @@ class Golem(object):
 
     def move(self):
         dt=self.args.dt
-        dt=self.velocity*dt+(4.0*self.acceleration0-self.acceleration1)*dt**2
-        self.position+=dt
+        dp=self.velocity*dt+(4.0*self.acceleration0-self.acceleration1)*dt**2
+        self.position+=dp
         self.vpredict = self.velocity+ (3.0*self.acceleration0 - self.acceleration1)*dt/2.0
         self.acceleration2 += self.attractors.get_force(self.position)
 
     def do_move(self):
-        if final_attractor:
+        if self.final_attractor:
             return False
-        self.do_move()
+        self.move()
         self.end_check()
         return True
 
@@ -34,3 +34,4 @@ class Golem(object):
         if self.attractors.min_distance(self.position) < self.args.pot_d and abs(self.velocity) < self.args.term_v: # close to the city and low velocity
             self.final_attractor=self.attractors.min_attractor(self.position)
             return True
+        return False
