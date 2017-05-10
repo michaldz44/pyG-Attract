@@ -33,8 +33,8 @@ def main():
 
     steps=0
     while any(golems_functions):
-        new_golems_functions=[golem_function() for golem_function in golems_functions]
-        golems_functions=new_golems_functions
+        golem_runnig=[golem_function() for golem_function in golems_functions]
+        #no_of_golems_running=sum([1 for rg in golem_runnig if fg])
         steps+=1
         #if steps > step limit
         # break
