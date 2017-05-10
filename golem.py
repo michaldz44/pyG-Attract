@@ -18,9 +18,9 @@ class Golem(object):
         self.acceleration2 += self.attractors.get_force(self.position,self.vpredict)
 
         self.acceleration2 += self.position - self.args.mu*self.vpredict
-        self.velocity += (2.0*self.acceleration2+5.0*acceleration0 - acceleration1)*dt/6.0
+        self.velocity += (2.0*self.acceleration2+5.0*self.acceleration0 - self.acceleration1)*dt/6.0
         self.acceleration1 = self.acceleration0
-        self.acceleration0 = acceleration2
+        self.acceleration0 = self.acceleration2
 
 
 
