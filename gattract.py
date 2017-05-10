@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--mu', type=float, default=0.7, help='friction coefficient')
     parser.add_argument('--size', type=int, default=100, help='Problem size (N as it will compute NxN matrix) ')
     parser.add_argument('positions', type=str, help='Geojson file containing positions with masses')
+    
+
 
     args = parser.parse_args()
 
