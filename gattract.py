@@ -24,13 +24,20 @@ def main():
     attractors=Attractors(js)
 
     N=args.positions
+    # We choose points from [0,1]x[0,1] area
+    # WE split it into NxN regoins (future pixels)
+    # Each golem gets position according to pixel center which is
+    golems=[Golem((i%N+0.5)/N,(i//N+0.5)/N,args,attractors) for i in range(N*N)]
 
-    golems=[Golem(i%N,i//N,args,attractors) for i in range(N*N)]
     golems_functions=[golem.do_move for golem in golems]
 
+    steps=0
     while any(golems_functions):
         new_golems_functions=[golem_function() for golem_function in golems_functions]
         golems_functions=new_golems_functions
+        steps+=1
+        #if steps > step limit
+        # break
     #
 
     img = Image.new( 'RGB', (N,N), "black") # create a new black image
@@ -39,6 +46,7 @@ def main():
     for i in range(N*N):    # for every pixel:
         pixels[i%N,i//N] = (i%N, i//N, golems[i].get_color()) # set the colour accordingly
     img.show()
+
 
 if __name__ == "__main__":
     main()
