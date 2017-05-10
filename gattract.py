@@ -15,6 +15,7 @@ def main():
     parser.add_argument('--term_v', type=float, default=0.005, help='terminatig velocity')
     parser.add_argument('--mu', type=float, default=0.7, help='friction coefficient')
     parser.add_argument('--size', type=int, default=100, help='Problem size (N as it will compute NxN matrix) ')
+    parser.add_argument('--max_steps', type=int, default=False, help='Max steps that will occure (default run each terminated)')
     parser.add_argument('positions', type=str, help='Geojson file containing positions with masses')
 
     args = parser.parse_args()
@@ -30,14 +31,15 @@ def main():
     golems=[Golem((i%N+0.5)/N,(i//N+0.5)/N,args,attractors) for i in range(N*N)]
 
     golems_functions=[golem.do_move for golem in golems]
+    golem_runnig=golem_functions
 
     steps=0
-    while any(golems_functions):
+    while any(golem_runnig):
         golem_runnig=[golem_function() for golem_function in golems_functions]
         #no_of_golems_running=sum([1 for rg in golem_runnig if fg])
         steps+=1
-        #if steps > step limit
-        # break
+        if args.max_steps and args.max_steps < steps:
+            break
     #
 
     img = Image.new( 'RGB', (N,N), "black") # create a new black image
