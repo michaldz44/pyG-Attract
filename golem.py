@@ -8,6 +8,7 @@ class Golem(object):
         self.acceleration1=complex(0,0)
         self.acceleration2=complex(0,0)
         self.vpredict=complex(0.0)
+        self.final_attractor=None
 
     def move(self):
         dt=self.args.dt
@@ -17,12 +18,17 @@ class Golem(object):
         self.acceleration2 += self.attractors.get_force(self.position)
 
     def do_move(self):
-        if self.end():
+        if not self.end():
             return self.do_move
         else:
             return None
 
+    def get_color(self):
+        if self.final_attractor:
+            return self.final_attractor["color"]
+
     def end(self):
+
         if self.attractors.min_distance(self.position) < self.args.pot_d and abs(self.velocity) < self.args.term_v: # close to the city and low velocity
             return True
 

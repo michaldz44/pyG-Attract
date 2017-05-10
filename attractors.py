@@ -27,4 +27,8 @@ class Attractors(object):
     def min_distance(self,position):
         return min([abs(position-attractor["position"]) for attractor in self.attractors])
 
-    def
+    def min_attractor(self,position):
+        return min([{
+                "distance":abs(position-attractor["position"]),
+                "attractor":attractor
+                } for attractor in self.attractors],key=lambda x:x["distance"])["attractor"]
