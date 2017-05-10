@@ -4,6 +4,7 @@ import sys
 from golem import Golem
 from attractors import Attractors
 from PIL import Image
+import matplotlib.pyplot as plt
 
 
 
@@ -36,10 +37,14 @@ def main():
     golem_runnig=golems_functions
 
     steps=0
+    positions_x=[]
+    positions_y=[]
     while any(golem_runnig):
         golem_runnig=[golem_function() for golem_function in golems_functions]
         #no_of_golems_running=sum([1 for rg in golem_runnig if fg])
-        print(golems[0].position)
+        #print(golems[0].position)
+        #positions_x.append(golems[0].position.real)
+        #positions_y.append(golems[0].position.imag)
         steps+=1
         if args.max_steps and args.max_steps < steps:
             break
@@ -51,9 +56,13 @@ def main():
     for i in range(N*N):    # for every pixel:
         color = golems[i].get_color()
         if color:
-            pixels[i%N,i//N] = (i%N, i//N, color) # set the colour accordingly
+            pixels[i%N,i//N] = tuple(color) # set the colour accordingly
     img.show()
 
+    plt.plot(positions_x,positions_y)
+    for at in attractors.attractors:
+        plt.plot([at["position"].real],[at["position"].imag],'r*')
+    plt.show()
 
 if __name__ == "__main__":
     main()
