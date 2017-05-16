@@ -1,3 +1,4 @@
+import math
 class Attractors(object):
     def __init__(self,js, args):
         assert js["type"]=="FeatureCollection"
@@ -5,7 +6,6 @@ class Attractors(object):
 
         self.attractors=[]
         self.args = args
-
 
         for feature in js["features"]:
             assert "geometry" in feature
@@ -19,28 +19,44 @@ class Attractors(object):
                 "position":complex(*feature["geometry"]["coordinates"])
             })
 
-    #def distances_list(self,position):
-    #    return
+        c=250
+        for attractor1 in self.attractors:
+            energy=[]
+            for attractor2 in self.attractors:
+                if attractor1==attractor2:
+                    continue
+                v=(attractor2["position"]-attractor1["position"]) /c
+                m=max([self.get_potencial(attractor1["position"]+v*linspace) for linspace in range(1,c)])
+                energy.append(m)
+            attractor1["esc_energy"]=min(energy)-(1/c)*min(energy)
 
     def get_force(self,position,velocity):
         list_of_potentialsMG=[]
         for attractor in self.attractors:
             absz = abs(attractor["position"]-position)
-            versor = (attractor["position"]-position) / (absz)
+            if absz>0.00001:
 
-            component = attractor["mass"]/(absz**2+self.args.h**2)*versor/(absz**2+self.args.h**2)**(0.5)
+                versor = (attractor["position"]-position) / (absz)
+                component = (versor*attractor["mass"])/math.pow(absz**2+self.args.h**2,1.5)
+
+                list_of_potentialsMG.append(component)
+        sum_of_potentials = sum(list_of_potentialsMG)
+
+        return (-self.args.mu*velocity) + sum_of_potentials
+
+    def get_potencial(self,position):
+        list_of_potentialsMG=[]
+        for attractor in self.attractors:
+            absz = abs(attractor["position"]-position)
+            if absz>0.00001:
+                component = (-attractor["mass"])/math.sqrt(absz**2+self.args.h**2)+1/self.args.h
+            else:
+
+                component = 1/self.args.h
             list_of_potentialsMG.append(component)
         sum_of_potentials = sum(list_of_potentialsMG)
 
-        return -self.args.mu*velocity + sum_of_potentials
-
-
-        #powiniein zwracac sile o wlasciwym kierunku i zwrocie
-     #   return -sum([attractor["mass"]/(position-attractor["position"])*abs(position-attractor["position"]) for attractor in  self.attractors])
-       # return
-
-
-
+        return  sum_of_potentials
 
     def min_distance(self,position):
         return min([abs(position-attractor["position"]) for attractor in self.attractors])
