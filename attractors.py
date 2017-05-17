@@ -1,4 +1,4 @@
-import math
+import math,pdb
 class Attractors(object):
     def __init__(self,js, args):
         assert js["type"]=="FeatureCollection"
@@ -32,27 +32,29 @@ class Attractors(object):
 
     def get_force(self,position,velocity):
         list_of_potentialsMG=[]
+        h=self.args.h
         for attractor in self.attractors:
             absz = abs(attractor["position"]-position)
-            if absz>0.00001:
+            versor = (attractor["position"]-position) / (absz)
+            component = (versor*attractor["mass"])/math.pow(absz*absz+h*h,1.5)
 
-                versor = (attractor["position"]-position) / (absz)
-                component = (versor*attractor["mass"])/math.pow(absz**2+self.args.h**2,1.5)
-
-                list_of_potentialsMG.append(component)
+            list_of_potentialsMG.append(component)
         sum_of_potentials = sum(list_of_potentialsMG)
 
         return (-self.args.mu*velocity) + sum_of_potentials
 
     def get_potencial(self,position):
         list_of_potentialsMG=[]
+        h=self.args.h
         for attractor in self.attractors:
             absz = abs(attractor["position"]-position)
-            if absz>0.00001:
-                component = (-attractor["mass"])/math.sqrt(absz**2+self.args.h**2)+1/self.args.h
-            else:
-
-                component = 1/self.args.h
+            #if absz>0.00001:
+            try:
+                component = 1/h+(-attractor["mass"])/math.sqrt(absz*absz+h*h)
+            except:
+                pdb.set_trace()
+            #else:
+            #    component = 1/h
             list_of_potentialsMG.append(component)
         sum_of_potentials = sum(list_of_potentialsMG)
 

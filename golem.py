@@ -1,39 +1,70 @@
 import math
+import pdb
 
 class Golem(object):
-    def __init__(self, x, y, args, attractors):
+    def __init__(self, x, y, args, attractors,golem_number):
         self.attractors=attractors
         self.args=args
         self.position=complex(x,y)
         self.velocity=complex(0,0)
-        self.acceleration0=complex(0,0)
-        self.acceleration1=complex(0,0)
-        self.acceleration2=complex(0,0)
-        self.vpredict=complex(0.0)
+        #self.acceleration_previous=self.attractors.get_force(self.position,self.velocity)
+        self.acceleration_previous=0
         self.final_attractor=None
         self.energy=self.get_energy()
+        self.golem_number=golem_number
+        self.state=[]
 
     def move(self):
         # step
-        dt=self.args.dt
-
-        #dp=self.velocity*dt+(4.0*self.acceleration0-self.acceleration1)*dt**2
-
-        if abs(self.velocity)==0:
-            self.velocity=self.attractors.get_force(self.position,self.velocity)*dt
+        absv=abs(self.velocity)
+        if absv>1:
+            dt=self.args.dt*1/(absv)
         else:
-            v=abs(self.velocity)
-            self.velocity+=self.attractors.get_force(self.position,self.velocity)*dt
-            self.velocity=v*self.velocity/abs(self.velocity)
+            dt=self.args.dt
+        acceleration_current=self.attractors.get_force(self.position,self.velocity)
 
+        # let's ty to be accurate apply Beeman-Schofield algoritm
+        #
+        # position=\
+        #     self.position+\
+        #     self.velocity*dt+\
+        #     dt*dt*(4*acceleration_current-self.acceleration_previous)/6.0
+        #
+        # v_predict=\
+        #     self.velocity+\
+        #     dt*(3*acceleration_current-self.acceleration_previous)/2.0
+        #
+        # acceleration_future=self.attractors.get_force(position,v_predict)
+        #
+        # self.velocity+=dt*(2*acceleration_future+5*acceleration_current-self.acceleration_previous)/6.0
+        #
+        # self.acceleration_previous=acceleration_current
+        # self.position=position
+
+        # Euler-Cromer fast simplified version
+        self.velocity+=acceleration_current*dt
         self.position+=self.velocity*dt
+
         if (self.energy-self.attractors.get_potencial(self.position))>0:
             v=math.sqrt(2*(self.energy-self.attractors.get_potencial(self.position)))
         else:
-            v=0
-        self.velocity=v*self.velocity/abs(self.velocity)
+            print("drag problem  - velocity anihilated",self.golem_number,abs(self.velocity))
+            if abs(self.velocity)>0.1:
+                pdb.set_trace()
+            v=0.000001
+            #v=-math.sqrt(-2*(self.energy-self.attractors.get_potencial(self.position)))
 
-        self.energy-=dt*self.args.mu*abs(self.velocity)**2
+        absv=abs(self.velocity)
+        self.velocity=v*self.velocity/absv
+        #self.q=v/absv
+        self.energy-=dt*self.args.mu*absv*absv
+        #
+        # self.state.append((
+        #     abs(self.velocity),
+        #     self.attractors.get_potencial(self.position),
+        #     self.energy,
+        #     dt
+        # ))
 
         #self.vpredict = self.velocity+ (3.0*self.acceleration0 - self.acceleration1)*dt/2.0
         #self.acceleration2 += self.attractors.get_force(self.position,self.vpredict)

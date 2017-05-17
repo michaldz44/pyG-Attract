@@ -17,6 +17,16 @@ def main():
     parser.add_argument('--max_steps', type=int, default=False, help='Max steps that will occure (default run each terminated)')
     parser.add_argument('positions', type=str, help='Geojson file containing positions with masses')
 
+    try:
+       with open('data1.pkl', 'rb') as input:
+           import matplotlib.pyplot as plt
+           (positions_x,positions_y) = pickle.load(input)
+           plt.plot(positions_x,positions_y)
+           for at in attractors.attractors:
+               plt.plot([at["position"].real],[at["position"].imag],'r*')
+           plt.show()
+    except:
+       pass
 
 
     args = parser.parse_args()
@@ -29,7 +39,7 @@ def main():
     # We choose points from [0,1]x[0,1] area
     # WE split it into NxN regoins (future pixels)
     # Each golem gets position according to pixel center which is
-    golems=[Golem((i%N+0.5)/N,(i//N+0.5)/N,args,attractors) for i in range(N*N)]
+    golems=[Golem((i%N+0.5)/N,(i//N+0.5)/N,args,attractors,i) for i in range(N*N)]
 
     for a in attractors.attractors:
         print(a["esc_energy"])
@@ -41,22 +51,27 @@ def main():
     steps=0
     positions_x=[]
     positions_y=[]
-    number_to_view=10
+    number_to_view=0
     while any(golem_runnig):
         golem_runnig=[golem_function() for golem_function in golems_functions]
         no_of_golems_running=sum([1 for rg in golem_runnig if rg])
-        print(
-            repr(golems[number_to_view].position).ljust(43),
-            repr(golems[number_to_view].get_energy()).ljust(20),
-            repr(golems[number_to_view].energy).ljust(20),
-            repr(no_of_golems_running).rjust(5)
-        )
-        positions_x.append(golems[10].position.real)
-        positions_y.append(golems[10].position.imag)
+        if len(golems)<1000 or (len(golems)>=1000 and steps%10==0):
+            print(
+                repr(abs(golems[number_to_view].velocity)).ljust(43),
+                repr(golems[number_to_view].get_energy()).ljust(20),
+                repr(golems[number_to_view].energy).ljust(20),
+                repr(no_of_golems_running).rjust(5),
+    #            repr(golems[number_to_view].q).rjust(5),
+
+            )
+        positions_x.append(golems[number_to_view].position.real)
+        positions_y.append(golems[number_to_view].position.imag)
         steps+=1
         if args.max_steps and args.max_steps < steps:
             break
     #
+    for golem in golems:
+        golem.final_attractor=golem.attractors.min_attractor(golem.position)
 
     try:
         #try:
@@ -79,11 +94,6 @@ def main():
             pickle.dump(golems, output, pickle.HIGHEST_PROTOCOL)
 
     try:
-        #try:
-        #    with open('data1.pkl', 'rb') as input:
-        #        (positions_x,positions_y) = pickle.load(input)
-        #except:
-        #    pass
 
         import matplotlib.pyplot as plt
         plt.plot(positions_x,positions_y)
